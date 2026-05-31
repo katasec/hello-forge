@@ -71,11 +71,7 @@ func setupXaiAgent() *forge.Agent {
 
 	// Setup config and context
 	config := forge.Config{
-		Provider: xai.New(
-			key,
-			xai.ModelGrok4FastNonReasoning,
-			xai.WithWebSearch(),
-		),
+		Provider:     xai.New(key, xai.ModelGrok4FastNonReasoning, xai.WithWebSearch()),
 		SystemPrompt: "You are a helpful assistant. Keep responses brief.",
 	}
 
