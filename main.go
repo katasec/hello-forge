@@ -14,9 +14,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/katasec/forge"
-	"github.com/katasec/forge/provider/openai"
-	"github.com/katasec/forge/provider/xai"
+	forge "github.com/katasec/forge-core"
+	"github.com/katasec/forge-core/provider/openai"
+	"github.com/katasec/forge-core/provider/xai"
 )
 
 func main() {
