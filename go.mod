@@ -2,7 +2,7 @@ module github.com/ameerdeen/hello-forge
 
 go 1.25.6
 
-require github.com/katasec/forge-core v0.1.0
+require github.com/katasec/forge-core v0.4.0
 
 require (
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
