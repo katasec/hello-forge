@@ -1,11 +1,12 @@
 // Hello Forge is the simplest possible forge example.
 //
-// Shows how to call OpenAI and xAI using Forge agents.
+// Shows how to call OpenAI, xAI, and Anthropic using Forge agents.
 //
 // Usage:
 //
 //	export OPENAI_API_KEY=sk-...
 //	export XAI_API_KEY=xai-...
+//	export ANTHROPIC_API_KEY=sk-ant-...
 //	go run .
 package main
 
@@ -16,6 +17,7 @@ import (
 	"os"
 
 	forge "github.com/katasec/forge-core"
+	"github.com/katasec/forge-core/provider/anthropic"
 	"github.com/katasec/forge-core/provider/openai"
 	"github.com/katasec/forge-core/provider/xai"
 )
@@ -23,23 +25,13 @@ import (
 func main() {
 	ctx := context.Background()
 
-	runAgent(ctx, "OpenAI", "Hello! Who made you?", setupOpenAIAgent())
-	runAgent(ctx, "xAI Search", "Find a recent source about xAI and summarize it briefly.", setupXaiAgent())
-}
+	openAIAgent := setupOpenAIAgent()
+	xaiAgent := setupXaiAgent()
+	anthropicAgent := setupAnthropicAgent()
 
-func runAgent(ctx context.Context, name string, prompt string, agent *forge.Agent) {
-	resp, err := agent.Ask(ctx, prompt)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	printResponse(name, resp)
-}
-
-func printResponse(name string, resp *forge.AgentResponse) {
-	fmt.Printf("\n[%s]\n", name)
-	fmt.Println(resp.LastText())
-	fmt.Printf("\n[tokens: %d in, %d out]\n", resp.Usage.InputTokens, resp.Usage.OutputTokens)
+	runAgent(ctx, "OpenAI", "Hello! Who made you?", openAIAgent)
+	runAgent(ctx, "xAI Search", "Find a recent source about xAI and summarize it briefly.", xaiAgent)
+	runAgent(ctx, "Anthropic", "Hello! Who made you?", anthropicAgent)
 }
 
 func setupOpenAIAgent() *forge.Agent {
@@ -82,4 +74,40 @@ func setupXaiAgent() *forge.Agent {
 	}
 
 	return agent
+}
+
+func setupAnthropicAgent() *forge.Agent {
+	key := os.Getenv("ANTHROPIC_API_KEY")
+	if key == "" {
+		log.Fatal("Set ANTHROPIC_API_KEY environment variable")
+	}
+
+	// Setup config and context
+	config := forge.Config{
+		Provider:     anthropic.New(key, anthropic.ModelClaudeOpus5),
+		SystemPrompt: "You are a helpful assistant. Keep responses brief.",
+	}
+
+	// Create agent
+	agent, err := forge.NewAgent(config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return agent
+}
+
+func runAgent(ctx context.Context, name string, prompt string, agent *forge.Agent) {
+	resp, err := agent.Ask(ctx, prompt)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	printResponse(name, resp)
+}
+
+func printResponse(name string, resp *forge.AgentResponse) {
+	fmt.Printf("\n[%s]\n", name)
+	fmt.Println(resp.LastText())
+	fmt.Printf("\n[tokens: %d in, %d out]\n", resp.Usage.InputTokens, resp.Usage.OutputTokens)
 }
