@@ -2,7 +2,7 @@ module github.com/ameerdeen/hello-forge
 
 go 1.25.6
 
-require github.com/katasec/forge-core v0.4.0
+require github.com/katasec/forge-core v0.5.0
 
 require (
 	github.com/anthropics/anthropic-sdk-go v1.75.0 // indirect
@@ -21,5 +21,3 @@ require (
 	go.yaml.in/yaml/v4 v4.0.0-rc.2 // indirect
 	golang.org/x/sync v0.22.0 // indirect
 )
-
-replace github.com/katasec/forge-core => ../forge-core
