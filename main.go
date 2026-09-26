@@ -1,6 +1,7 @@
 // Hello Forge is the simplest possible forge example.
 //
-// Shows how to call OpenAI, xAI, and Anthropic using Forge agents.
+// Shows how to call OpenAI, xAI, and Anthropic using Forge agents, including
+// a tool call against each provider that supports tools.
 //
 // Usage:
 //
@@ -20,7 +21,25 @@ import (
 	"github.com/katasec/forge-core/provider/anthropic"
 	"github.com/katasec/forge-core/provider/openai"
 	"github.com/katasec/forge-core/provider/xai"
+	"github.com/katasec/forge-core/tool"
 )
+
+// addInput is the typed argument struct for the add tool. Forge derives the
+// tool's JSON Schema from it.
+type addInput struct {
+	A int `json:"a" jsonschema:"description=First number"`
+	B int `json:"b" jsonschema:"description=Second number"`
+}
+
+// addTool returns a tool the model can call. It prints when it runs, so a real
+// tool call is visible rather than inferred from the answer.
+func addTool() forge.Tool {
+	return tool.Func[addInput, int]("add", "Adds two numbers and returns their sum",
+		func(_ context.Context, in addInput) (int, error) {
+			fmt.Printf("  -> tool add(%d, %d) invoked\n", in.A, in.B)
+			return in.A + in.B, nil
+		})
+}
 
 func main() {
 	ctx := context.Background()
@@ -32,6 +51,10 @@ func main() {
 	runAgent(ctx, "OpenAI", "Hello! Who made you?", openAIAgent)
 	runAgent(ctx, "xAI Search", "Find a recent source about xAI and summarize it briefly.", xaiAgent)
 	runAgent(ctx, "Anthropic", "Hello! Who made you?", anthropicAgent)
+
+	const toolPrompt = "What is 21 + 21? Use the add tool."
+	runAgent(ctx, "OpenAI Tools", toolPrompt, openAIAgent)
+	runAgent(ctx, "Anthropic Tools", toolPrompt, anthropicAgent)
 }
 
 func setupOpenAIAgent() *forge.Agent {
@@ -44,6 +67,7 @@ func setupOpenAIAgent() *forge.Agent {
 	config := forge.Config{
 		Provider:     openai.New(key, openai.ModelGPT54Nano),
 		SystemPrompt: "You are a helpful assistant. Keep responses brief.",
+		Tools:        []forge.Tool{addTool()},
 	}
 
 	// Create agent
@@ -86,6 +110,7 @@ func setupAnthropicAgent() *forge.Agent {
 	config := forge.Config{
 		Provider:     anthropic.New(key, anthropic.ModelClaudeOpus5),
 		SystemPrompt: "You are a helpful assistant. Keep responses brief.",
+		Tools:        []forge.Tool{addTool()},
 	}
 
 	// Create agent
