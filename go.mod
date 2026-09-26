@@ -1,4 +1,4 @@
-module github.com/ameerdeen/hello-forge
+module github.com/katasec/hello-kiln
 
 go 1.25.6
 
