@@ -1,18 +1,33 @@
-# Hello Forge
+# Hello Kiln
 
-The smallest forge-core example: use a Forge provider, build an agent with `forge.Config`, ask one question, and print the latest assistant text.
+The smallest [kiln](https://github.com/katasec/kiln) example: build an agent for
+each provider, ask a question, and call a tool.
 
 ## Run
 
 ```bash
-export XAI_API_KEY=xai-...
 export OPENAI_API_KEY=sk-...
+export XAI_API_KEY=xai-...
+export ANTHROPIC_API_KEY=sk-ant-...
 go run .
 ```
 
+All three keys are required — the example exercises every provider in one run.
+
 ## What this shows
 
-- `forge.Config` as the agent setup point
-- using `provider/openai` or `provider/xai`
-- `agent.Ask(ctx, prompt)` for the common path
-- `resp.LastText()` for the latest assistant answer
+- `kiln.Config` as the agent setup point, one agent per provider
+- `provider/openai`, `provider/xai` and `provider/anthropic`
+- `xai.WithWebSearch()` plus `provider.LastCitations()` for sourced answers
+- `tool.Func[In, Out]` registering a typed Go function the model can call
+- `agent.Ask(ctx, prompt)` for the common path, and `resp.LastText()` for the answer
+- `resp.Usage` for per-call token counts
+
+The `add` tool prints when it runs, so a real tool call is visible rather than
+inferred from the answer:
+
+```
+[Anthropic Tools]
+  -> tool add(21, 21) invoked
+21 + 21 = 42
+```

@@ -1,6 +1,6 @@
-// Hello Forge is the simplest possible forge example.
+// Hello Kiln is the simplest possible kiln example.
 //
-// Shows how to call OpenAI, xAI, and Anthropic using Forge agents, including
+// Shows how to call OpenAI, xAI, and Anthropic using kiln agents, including
 // a tool call against each provider that supports tools.
 //
 // Usage:
@@ -24,7 +24,7 @@ import (
 	"github.com/katasec/kiln/tool"
 )
 
-// addInput is the typed argument struct for the add tool. Forge derives the
+// addInput is the typed argument struct for the add tool. Kiln derives the
 // tool's JSON Schema from it.
 type addInput struct {
 	A int `json:"a" jsonschema:"description=First number"`
