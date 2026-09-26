@@ -17,11 +17,11 @@ import (
 	"log"
 	"os"
 
-	forge "github.com/katasec/forge-core"
-	"github.com/katasec/forge-core/provider/anthropic"
-	"github.com/katasec/forge-core/provider/openai"
-	"github.com/katasec/forge-core/provider/xai"
-	"github.com/katasec/forge-core/tool"
+	"github.com/katasec/kiln"
+	"github.com/katasec/kiln/provider/anthropic"
+	"github.com/katasec/kiln/provider/openai"
+	"github.com/katasec/kiln/provider/xai"
+	"github.com/katasec/kiln/tool"
 )
 
 // addInput is the typed argument struct for the add tool. Forge derives the
@@ -33,7 +33,7 @@ type addInput struct {
 
 // addTool returns a tool the model can call. It prints when it runs, so a real
 // tool call is visible rather than inferred from the answer.
-func addTool() forge.Tool {
+func addTool() kiln.Tool {
 	return tool.Func[addInput, int]("add", "Adds two numbers and returns their sum",
 		func(_ context.Context, in addInput) (int, error) {
 			fmt.Printf("  -> tool add(%d, %d) invoked\n", in.A, in.B)
@@ -57,21 +57,21 @@ func main() {
 	runAgent(ctx, "Anthropic Tools", toolPrompt, anthropicAgent)
 }
 
-func setupOpenAIAgent() *forge.Agent {
+func setupOpenAIAgent() *kiln.Agent {
 	key := os.Getenv("OPENAI_API_KEY")
 	if key == "" {
 		log.Fatal("Set OPENAI_API_KEY environment variable")
 	}
 
 	// Setup config and context
-	config := forge.Config{
+	config := kiln.Config{
 		Provider:     openai.New(key, openai.ModelGPT54Nano),
 		SystemPrompt: "You are a helpful assistant. Keep responses brief.",
-		Tools:        []forge.Tool{addTool()},
+		Tools:        []kiln.Tool{addTool()},
 	}
 
 	// Create agent
-	agent, err := forge.NewAgent(config)
+	agent, err := kiln.NewAgent(config)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -79,20 +79,20 @@ func setupOpenAIAgent() *forge.Agent {
 	return agent
 }
 
-func setupXaiAgent() *forge.Agent {
+func setupXaiAgent() *kiln.Agent {
 	key := os.Getenv("XAI_API_KEY")
 	if key == "" {
 		log.Fatal("Set XAI_API_KEY environment variable")
 	}
 
 	// Setup config and context
-	config := forge.Config{
+	config := kiln.Config{
 		Provider:     xai.New(key, xai.ModelGrok4FastNonReasoning, xai.WithWebSearch()),
 		SystemPrompt: "You are a helpful assistant. Keep responses brief.",
 	}
 
 	// Create agent
-	agent, err := forge.NewAgent(config)
+	agent, err := kiln.NewAgent(config)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -100,21 +100,21 @@ func setupXaiAgent() *forge.Agent {
 	return agent
 }
 
-func setupAnthropicAgent() *forge.Agent {
+func setupAnthropicAgent() *kiln.Agent {
 	key := os.Getenv("ANTHROPIC_API_KEY")
 	if key == "" {
 		log.Fatal("Set ANTHROPIC_API_KEY environment variable")
 	}
 
 	// Setup config and context
-	config := forge.Config{
+	config := kiln.Config{
 		Provider:     anthropic.New(key, anthropic.ModelClaudeOpus5),
 		SystemPrompt: "You are a helpful assistant. Keep responses brief.",
-		Tools:        []forge.Tool{addTool()},
+		Tools:        []kiln.Tool{addTool()},
 	}
 
 	// Create agent
-	agent, err := forge.NewAgent(config)
+	agent, err := kiln.NewAgent(config)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -122,7 +122,7 @@ func setupAnthropicAgent() *forge.Agent {
 	return agent
 }
 
-func runAgent(ctx context.Context, name string, prompt string, agent *forge.Agent) {
+func runAgent(ctx context.Context, name string, prompt string, agent *kiln.Agent) {
 	resp, err := agent.Ask(ctx, prompt)
 	if err != nil {
 		log.Fatal(err)
@@ -131,7 +131,7 @@ func runAgent(ctx context.Context, name string, prompt string, agent *forge.Agen
 	printResponse(name, resp)
 }
 
-func printResponse(name string, resp *forge.AgentResponse) {
+func printResponse(name string, resp *kiln.AgentResponse) {
 	fmt.Printf("\n[%s]\n", name)
 	fmt.Println(resp.LastText())
 	fmt.Printf("\n[tokens: %d in, %d out]\n", resp.Usage.InputTokens, resp.Usage.OutputTokens)
