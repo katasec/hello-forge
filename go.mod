@@ -2,7 +2,7 @@ module github.com/katasec/hello-kiln
 
 go 1.25.6
 
-require github.com/katasec/kiln v0.7.0
+require github.com/katasec/kiln v0.8.0
 
 require (
 	github.com/anthropics/anthropic-sdk-go v1.75.0 // indirect

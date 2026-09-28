@@ -87,7 +87,7 @@ func setupXaiAgent() *kiln.Agent {
 
 	// Setup config and context
 	config := kiln.Config{
-		Provider:     xai.New(key, xai.ModelGrok4FastNonReasoning, xai.WithWebSearch()),
+		Provider:     xai.New(key, xai.ModelGrok47, xai.WithWebSearch()),
 		SystemPrompt: "You are a helpful assistant. Keep responses brief.",
 	}
 
